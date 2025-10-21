@@ -125,21 +125,19 @@ function createWindow() {
 
     if (url.endsWith("login_en.asp")) {
       routerView?.webContents.executeJavaScript(`
-        (function() {
-          const u = document.querySelector('#username');
-          const p = document.querySelector('#psd');
-          const v = document.querySelector('#verification_code');
-          
-          if(u) u.value = "${USERNAME}";
-          if(p) p.value = "${PASSWORD}";
-          if(v) v.value = document.querySelector('#check_code')?.value || "";
-          
-          // call the page's built-in submit function
-          if(typeof on_submit === 'function') {
-            on_submit();
-            }
-            })();
-     `);
+      (function() {
+        const u = document.querySelector('#username');
+        const p = document.querySelector('#psd');
+        const v = document.querySelector('#verification_code');
+
+        if(u) u.value = "${USERNAME}";
+        if(p) p.value = "${PASSWORD}";
+        if(v) v.value = document.querySelector('#check_code')?.value || "";
+
+        if(typeof on_submit === 'function') on_submit();
+      })();
+    `);
+      // console.log("Auto-login executed");
     }
   });
 
@@ -166,8 +164,19 @@ app.commandLine.appendSwitch("disable-software-rasterizer");
 
 app.whenReady().then(createWindow);
 
-app.on("window-all-closed", () => {
+app.on("window-all-closed", async () => {
   if (process.platform !== "darwin") {
+    if (routerView) {
+      try {
+        await routerView.webContents.loadURL(
+          "http://192.168.1.1/boaform/admin/formLogout.asp"
+        );
+        // console.log("Logged out from router");
+      } catch (err) {
+        // console.error("Logout failed:", err);
+      }
+    }
+
     app.quit();
   }
 });
