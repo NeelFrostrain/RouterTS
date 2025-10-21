@@ -193,9 +193,7 @@ npm run preview
 
 The build process creates platform-specific installers:
 
-- **Windows**: `RouterTS-Windows-{version}-Setup.exe`
-- **macOS**: `RouterTS-Mac-{version}-Installer.dmg`
-- **Linux**: `RouterTS-Linux-{version}.AppImage`
+- **Windows**: `RouterTS-Windows-v0.0.1a-Setup.exe`
 
 ## 🤝 Contributing
 
