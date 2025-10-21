@@ -1,35 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/electron-vite.animate.svg'
-import './App.css'
+import { useEffect, useRef } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const routerContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const sendResize = () => {
+    if (routerContainerRef.current) {
+      const rect = routerContainerRef.current.getBoundingClientRect();
+      window.electron?.sendResize("send-resize", {
+        width: Math.floor(rect.width),
+        height: Math.floor(rect.height),
+        x: Math.floor(rect.x),
+        y: Math.floor(rect.y),
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (!routerContainerRef.current) return;
+    sendResize();
+
+    const routerObserver = new ResizeObserver(() => {
+      sendResize();
+    });
+
+    routerObserver.observe(routerContainerRef.current);
+    window.addEventListener("resize", sendResize);
+
+    return () => {
+      window.removeEventListener("resize", sendResize);
+      routerObserver.disconnect();
+    };
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://electron-vite.github.io" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div style={{ width: "100vw", height: "100vh" }}>
+      <div
+        style={{ width: "100vw", height: "100vh" }}
+        ref={routerContainerRef}
+      ></div>
+    </div>
+  );
+};
 
-export default App
+export default App;
