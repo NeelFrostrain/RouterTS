@@ -65,7 +65,7 @@ router-ts/
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/NeelFrostrain/RouterTS/
 cd router-ts
 
 # Install dependencies
