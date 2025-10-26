@@ -18,7 +18,9 @@ const PASSWORD = "admin@123";
 function createWindow() {
   window = new BrowserWindow({
     width: 1200,
-    height: 800,
+    height: 900,
+    frame: false,
+    titleBarStyle: "hidden",
     icon: windowIcon,
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
@@ -102,6 +104,31 @@ function createWindow() {
         height: data.height
       });
     }
+  });
+  ipcMain.handle("window:minimize", () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) win.minimize();
+  });
+  ipcMain.handle("window:maximize", () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) {
+      if (win.isMaximized()) win.unmaximize();
+      else win.maximize();
+    }
+  });
+  ipcMain.handle("window:close", () => {
+    const win = BrowserWindow.getFocusedWindow();
+    if (win) win.close();
+  });
+  ipcMain.handle("browser:forward", () => {
+    if (routerView == null ? void 0 : routerView.webContents.canGoForward())
+      routerView == null ? void 0 : routerView.webContents.goForward();
+  });
+  ipcMain.handle("browser:backward", () => {
+    if (routerView == null ? void 0 : routerView.webContents.canGoBack()) routerView == null ? void 0 : routerView.webContents.goBack();
+  });
+  ipcMain.handle("browser:reload", () => {
+    if (!(routerView == null ? void 0 : routerView.webContents.isLoading())) routerView == null ? void 0 : routerView.webContents.reload();
   });
 }
 app.disableHardwareAcceleration();

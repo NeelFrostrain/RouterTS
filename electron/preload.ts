@@ -26,7 +26,14 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 });
 
 contextBridge.exposeInMainWorld("electron", {
-  sendResize: (channel: string, msg: SendResize) => {
-    ipcRenderer.send(channel, msg);
-  },
+  sendResize: (channel: string, msg: SendResize) =>
+    ipcRenderer.send(channel, msg),
+
+  windowMinimize: () => ipcRenderer.invoke("window:minimize"),
+  windowMaximize: () => ipcRenderer.invoke("window:maximize"),
+  windowClose: () => ipcRenderer.invoke("window:close"),
+
+  bcGoForward: () => ipcRenderer.invoke("browser:forward"),
+  bcGoBackward: () => ipcRenderer.invoke("browser:backward"),
+  bcGoReload: () => ipcRenderer.invoke("browser:reload"),
 });

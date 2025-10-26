@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import TopBar from "./components/TopBar";
 
 const App = () => {
   const routerContainerRef = useRef<HTMLDivElement | null>(null);
@@ -33,11 +34,11 @@ const App = () => {
   }, []);
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <div
-        style={{ width: "100vw", height: "100vh" }}
-        ref={routerContainerRef}
-      ></div>
+    <div className="w-screen flex flex-col h-screen text-white">
+      <TopBar />
+      <div className="flex-1 w-full h-full py-10">
+        <div className="w-full h-full" ref={routerContainerRef} />
+      </div>
     </div>
   );
 };
