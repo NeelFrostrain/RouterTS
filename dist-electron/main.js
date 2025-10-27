@@ -1,158 +1,117 @@
-import { app, BrowserWindow, Tray, nativeImage, BrowserView, Menu, ipcMain } from "electron";
-import { fileURLToPath } from "node:url";
-import path from "node:path";
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-process.env.APP_ROOT = path.join(__dirname, "..");
-const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
-const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
-const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, "public") : RENDERER_DIST;
-const isWin = process.platform === "win32";
-const isMac = process.platform === "darwin";
-const windowIcon = isWin ? path.join(__dirname, "../release", "Icon.ico") : isMac ? path.join(process.env.VITE_PUBLIC, "Icon.icns") : path.join(process.env.VITE_PUBLIC, "Icon.png");
-const trayIcon = path.join(__dirname, "../release", "Icon.ico");
-let window = null;
-let routerView = null;
-const USERNAME = "admin";
-const PASSWORD = "admin@123";
-function createWindow() {
-  window = new BrowserWindow({
+import { app as s, BrowserWindow as c, Tray as f, nativeImage as r, BrowserView as b, Menu as h, ipcMain as a } from "electron";
+import { fileURLToPath as C } from "node:url";
+import t from "node:path";
+const l = t.dirname(C(import.meta.url));
+process.env.APP_ROOT = t.join(l, "..");
+const d = process.env.VITE_DEV_SERVER_URL, E = t.join(process.env.APP_ROOT, "dist-electron"), m = t.join(process.env.APP_ROOT, "dist");
+process.env.VITE_PUBLIC = d ? t.join(process.env.APP_ROOT, "public") : m;
+const I = process.platform === "win32", R = process.platform === "darwin", p = I ? t.join(l, "../release", "Icon.ico") : R ? t.join(process.env.VITE_PUBLIC, "Icon.icns") : t.join(process.env.VITE_PUBLIC, "Icon.png"), _ = t.join(l, "../release", "Icon.ico");
+let o = null, n = null;
+const g = "admin", u = "admin@123";
+function w() {
+  o = new c({
     width: 1200,
     height: 900,
-    frame: false,
+    frame: !1,
     titleBarStyle: "hidden",
-    icon: windowIcon,
+    icon: p,
     webPreferences: {
-      preload: path.join(__dirname, "preload.mjs"),
-      nodeIntegration: false,
-      contextIsolation: true
+      preload: t.join(l, "preload.mjs"),
+      nodeIntegration: !1,
+      contextIsolation: !0
     }
-  });
-  window.setMenu(null);
-  window.webContents.session.clearCache();
-  new Tray(nativeImage.createFromPath(trayIcon));
-  window.setIcon(nativeImage.createFromPath(windowIcon));
-  if (VITE_DEV_SERVER_URL) {
-    window.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    window.loadFile(path.join(RENDERER_DIST, "index.html"));
-  }
-  window.on("closed", () => {
-    routerView = null;
-    window = null;
-  });
-  routerView = new BrowserView({
+  }), o.setMenu(null), o.webContents.session.clearCache(), new f(r.createFromPath(_)), o.setIcon(r.createFromPath(p)), d ? o.loadURL(d) : o.loadFile(t.join(m, "index.html")), o.on("closed", () => {
+    n = null, o = null;
+  }), n = new b({
     webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true
+      nodeIntegration: !1,
+      contextIsolation: !0
     }
-  });
-  window.setBrowserView(routerView);
-  routerView.webContents.loadURL("http://192.168.1.1/");
-  routerView.webContents.on("context-menu", () => {
-    const menu = Menu.buildFromTemplate([
+  }), o.setBrowserView(n), n.webContents.loadURL("http://192.168.1.1/"), n.webContents.on("context-menu", () => {
+    h.buildFromTemplate([
       {
         label: "Copy",
         accelerator: "Ctrl+C",
-        click: () => routerView == null ? void 0 : routerView.webContents.copy()
+        click: () => n == null ? void 0 : n.webContents.copy()
       },
       { type: "separator" },
       {
         label: "Back",
-        enabled: (routerView == null ? void 0 : routerView.webContents.canGoBack()) ?? false,
-        click: () => routerView == null ? void 0 : routerView.webContents.goBack()
+        enabled: (n == null ? void 0 : n.webContents.canGoBack()) ?? !1,
+        click: () => n == null ? void 0 : n.webContents.goBack()
       },
       {
         label: "Forward",
-        enabled: (routerView == null ? void 0 : routerView.webContents.canGoForward()) ?? false,
-        click: () => routerView == null ? void 0 : routerView.webContents.goForward()
+        enabled: (n == null ? void 0 : n.webContents.canGoForward()) ?? !1,
+        click: () => n == null ? void 0 : n.webContents.goForward()
       },
       { type: "separator" },
       {
         label: "Reload",
         accelerator: "Ctrl+R",
-        click: () => routerView == null ? void 0 : routerView.webContents.reload()
+        click: () => n == null ? void 0 : n.webContents.reload()
       },
       { type: "separator" }
-    ]);
-    menu.popup({ window });
-  });
-  routerView.webContents.on("did-finish-load", () => {
-    const url = (routerView == null ? void 0 : routerView.webContents.getURL()) || "";
-    if (url.endsWith("login_en.asp")) {
-      routerView == null ? void 0 : routerView.webContents.executeJavaScript(`
+    ]).popup({ window: o });
+  }), n.webContents.on("did-finish-load", () => {
+    ((n == null ? void 0 : n.webContents.getURL()) || "").endsWith("login_en.asp") && (n == null || n.webContents.executeJavaScript(`
       (function() {
         const u = document.querySelector('#username');
         const p = document.querySelector('#psd');
         const v = document.querySelector('#verification_code');
 
-        if(u) u.value = "${USERNAME}";
-        if(p) p.value = "${PASSWORD}";
+        if(u) u.value = "${g}";
+        if(p) p.value = "${u}";
         if(v) v.value = document.querySelector('#check_code')?.value || "";
 
         if(typeof on_submit === 'function') on_submit();
       })();
-    `);
-    }
-  });
-  ipcMain.on("send-resize", (_, data) => {
-    if (routerView && window) {
-      routerView.setBounds({
-        x: data.x,
-        y: data.y,
-        width: data.width,
-        height: data.height
-      });
-    }
-  });
-  ipcMain.handle("window:minimize", () => {
-    const win = BrowserWindow.getFocusedWindow();
-    if (win) win.minimize();
-  });
-  ipcMain.handle("window:maximize", () => {
-    const win = BrowserWindow.getFocusedWindow();
-    if (win) {
-      if (win.isMaximized()) win.unmaximize();
-      else win.maximize();
-    }
-  });
-  ipcMain.handle("window:close", () => {
-    const win = BrowserWindow.getFocusedWindow();
-    if (win) win.close();
-  });
-  ipcMain.handle("browser:forward", () => {
-    if (routerView == null ? void 0 : routerView.webContents.canGoForward())
-      routerView == null ? void 0 : routerView.webContents.goForward();
-  });
-  ipcMain.handle("browser:backward", () => {
-    if (routerView == null ? void 0 : routerView.webContents.canGoBack()) routerView == null ? void 0 : routerView.webContents.goBack();
-  });
-  ipcMain.handle("browser:reload", () => {
-    if (!(routerView == null ? void 0 : routerView.webContents.isLoading())) routerView == null ? void 0 : routerView.webContents.reload();
+    `));
+  }), a.on("send-resize", (e, i) => {
+    n && o && n.setBounds({
+      x: i.x,
+      y: i.y,
+      width: i.width,
+      height: i.height
+    });
+  }), a.handle("window:minimize", () => {
+    const e = c.getFocusedWindow();
+    e && e.minimize();
+  }), a.handle("window:maximize", () => {
+    const e = c.getFocusedWindow();
+    e && (e.isMaximized() ? e.unmaximize() : e.maximize());
+  }), a.handle("window:close", () => {
+    const e = c.getFocusedWindow();
+    e && e.close();
+  }), a.handle("browser:forward", () => {
+    n != null && n.webContents.canGoForward() && (n == null || n.webContents.goForward());
+  }), a.handle("browser:backward", () => {
+    n != null && n.webContents.canGoBack() && (n == null || n.webContents.goBack());
+  }), a.handle("browser:reload", () => {
+    n != null && n.webContents.isLoading() || n == null || n.webContents.reload();
   });
 }
-app.disableHardwareAcceleration();
-app.commandLine.appendSwitch("disable-gpu");
-app.commandLine.appendSwitch("disable-software-rasterizer");
-app.whenReady().then(createWindow);
-app.on("window-all-closed", async () => {
+s.disableHardwareAcceleration();
+s.commandLine.appendSwitch("disable-gpu");
+s.commandLine.appendSwitch("disable-software-rasterizer");
+s.whenReady().then(w);
+s.on("window-all-closed", async () => {
   if (process.platform !== "darwin") {
-    if (routerView) {
+    if (n)
       try {
-        await routerView.webContents.loadURL(
+        await n.webContents.loadURL(
           "http://192.168.1.1/boaform/admin/formLogout.asp"
         );
-      } catch (err) {
+      } catch {
       }
-    }
-    app.quit();
+    s.quit();
   }
 });
-app.on("activate", () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+s.on("activate", () => {
+  c.getAllWindows().length === 0 && w();
 });
 export {
-  MAIN_DIST,
-  RENDERER_DIST,
-  VITE_DEV_SERVER_URL
+  E as MAIN_DIST,
+  m as RENDERER_DIST,
+  d as VITE_DEV_SERVER_URL
 };

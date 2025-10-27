@@ -32,9 +32,9 @@ const Titlebar = () => {
   const onCloseClick = () => window.electron?.windowClose();
 
   return (
-    <div className="w-full h-10 drag flex justify-between items-center px-2.5">
+    <div className="w-full h-9 drag flex justify-between items-center px-2.5">
       <div className="flex justify-start items-center gap-2">
-        <img src="../public/icon.png" className="size-4" />
+        <img src="./icon.png" className="size-4" />
         <p className="text-xs opacity-60">Router TS</p>
       </div>
       <div className="no-drag flex justify-end items-center gap-3.5">

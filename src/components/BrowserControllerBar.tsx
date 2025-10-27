@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, LogOut, RefreshCw } from "lucide-react";
+import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 
 interface IBCBTN {
   children?: React.ReactNode;
@@ -45,11 +45,6 @@ const BrowserControllerBar = () => {
           type="text"
           className="w-full h-full bg-black/25 rounded-md border border-white/35 outline-none px-2 text-sm text-white/80 transition-all ease-in-out duration-150"
         />
-      </div>
-      <div>
-        <BCBTN className="ml-1">
-          <LogOut size={15} strokeWidth={2} />
-        </BCBTN>
       </div>
     </div>
   );
